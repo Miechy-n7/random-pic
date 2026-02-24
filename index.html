@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <!-- 适配手机 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>随机图片</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* 页面全屏黑色背景，居中显示 */
+    body {
+      width: 100vw;
+      height: 100vh;
+      background-color: #000;
+      /* 点击光标变成小手，提示可点击 */
+      cursor: pointer;
+      /* 水平垂直居中 */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* 图片最大占满屏幕，不变形 */
+    #randomImg {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- 用于显示随机图片 -->
+  <img id="randomImg" alt="随机图片" />
+
+  <script>
+    // ====================== 核心逻辑 ======================
+    // 1. 从 images.json 加载所有图片链接
+    // 2. 页面加载时随机显示一张
+    // 3. 点击页面 → 再随机一张
+    // ======================================================
+
+    // 图片数组（存放从 json 读取的所有图片链接）
+    let imageList = [];
+    const imgElement = document.getElementById("randomImg");
+
+    // ========== 1. 加载 images.json 文件 ==========
+    async function loadImageList() {
+      try {
+        // 读取同级目录下的 images.json
+        const response = await fetch("./images.json");
+        // 转成 JSON 数组
+        imageList = await response.json();
+
+        if (imageList.length === 0) {
+          alert("图片列表为空！");
+          return;
+        }
+
+        // 加载完成，显示第一张随机图
+        showRandomImage();
+      } catch (err) {
+        console.error("加载图片列表失败：", err);
+        alert("加载图片列表失败，请检查 images.json 是否正确");
+      }
+    }
+
+    // ========== 2. 随机显示一张图片 ==========
+    function showRandomImage() {
+      if (imageList.length === 0) return;
+
+      // 生成 0 ~ 图片总数-1 的随机数
+      const randomIndex = Math.floor(Math.random() * imageList.length);
+      // 把随机图片地址赋值给 img 标签
+      imgElement.src = imageList[randomIndex];
+    }
+
+    // ========== 3. 点击页面切换图片 ==========
+    document.body.addEventListener("click", showRandomImage);
+
+    // ========== 页面一打开就加载图片列表 ==========
+    loadImageList();
+  </script>
+</body>
+</html>
